@@ -1,6 +1,7 @@
 const connectDB = require("../config/db");
 const Flight = require("../models/Flight");
 const Route = require("../models/Route");
+const Seat = require("../models/Seat");
 
 require("dotenv").config();
 
@@ -32,6 +33,7 @@ const generateFlights = async () => {
 
     await Flight.deleteMany();
     await Route.deleteMany();
+    await Seat.deleteMany();
 
     const routes = [];
     const flights = [];
@@ -75,9 +77,31 @@ const generateFlights = async () => {
     }
 
     await Route.insertMany(routes);
-    await Flight.insertMany(flights);
+    const createdFlights = await Flight.insertMany(flights);
+
+    // Generate seats for each flight
+    const allSeats = [];
+    createdFlights.forEach(flight => {
+      const rows = 30;
+      const seatLetters = ["A", "B", "C", "D", "E", "F"];
+      
+      for (let r = 1; r <= rows; r++) {
+        seatLetters.forEach(letter => {
+          allSeats.push({
+            flightId: flight._id,
+            seatNumber: r + letter,
+            status: "available"
+          });
+        });
+      }
+    });
+
+    if (allSeats.length > 0) {
+      await Seat.insertMany(allSeats);
+    }
 
     console.log("✅ 500+ Indian flights generated successfully");
+    console.log("✅ Seats generated for all flights");
 
     process.exit();
 

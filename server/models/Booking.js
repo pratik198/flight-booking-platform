@@ -11,10 +11,22 @@ const bookingSchema = new mongoose.Schema(
       ref: "Flight"
     },
     seatNumber: String,
+    // store passenger list so that booking details can be rendered later
+    passengers: [
+      {
+        firstName: String,
+        lastName: String,
+        age: Number,
+        gender: String,
+        phone: String
+      }
+    ],
+    totalAmount: Number,
+    holdId: String,
     pnr: String,
     status: {
       type: String,
-      enum: ["confirmed", "cancelled"],
+      enum: ["confirmed", "cancelled", "completed"],
       default: "confirmed"
     }
   },
