@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Plane, X } from 'lucide-react';
+import Fuse from 'fuse.js';
 import { AIRPORTS } from '../../utils/constants';
 
 const RouteAutocomplete = ({ 
@@ -37,18 +38,30 @@ const RouteAutocomplete = ({
     }
   }, [value]);
 
+  const fuse = useMemo(() => {
+    return new Fuse(AIRPORTS, {
+      keys: [
+        { name: 'code', weight: 0.3 },
+        { name: 'city', weight: 0.4 },
+        { name: 'name', weight: 0.2 },
+        { name: 'country', weight: 0.1 },
+      ],
+      includeScore: true,
+      threshold: 0.35,
+      ignoreLocation: true,
+    });
+  }, []);
+
   const handleInputChange = (e) => {
     const search = e.target.value;
     setInputValue(search);
     setSelectedIndex(-1);
-    
+
     if (search.length >= 2) {
-      const filtered = AIRPORTS.filter(airport => 
-        (airport.city.toLowerCase().includes(search.toLowerCase()) ||
-         airport.code.toLowerCase().includes(search.toLowerCase()) ||
-         airport.name.toLowerCase().includes(search.toLowerCase())) &&
-         airport.code !== excludeCode
-      ).slice(0, 8);
+      const results = fuse.search(search, { limit: 8 });
+      const filtered = results
+        .map((result) => result.item)
+        .filter((airport) => airport.code !== excludeCode);
       setSuggestions(filtered);
       setShowSuggestions(true);
     } else {

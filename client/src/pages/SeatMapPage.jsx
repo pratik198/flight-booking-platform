@@ -19,7 +19,7 @@ import Button from '../components/ui/Button';
 import { useFlights } from '../hooks/useFlights';
 import { useBooking } from '../hooks/useBooking';
 import { useSocket } from '../hooks/useSocket';
-import { formatCurrency, formatTime } from '../utils/helpers';
+import { formatCurrency, formatTime, formatDate } from '../utils/helpers';
 
 const SeatMapPage = () => {
   const { flightId } = useParams();
@@ -218,7 +218,7 @@ const SeatMapPage = () => {
                     <div className="flex justify-between">
                       <span className="text-gray-600">Date</span>
                       <span className="font-medium">
-                        {format(new Date(flight?.departureTime), 'dd MMM yyyy')}
+                        {formatDate(flight?.departureTime) || '-'}
                       </span>
                     </div>
                     <div className="flex justify-between">

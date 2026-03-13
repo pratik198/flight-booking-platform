@@ -20,17 +20,23 @@ export const formatCurrency = (amount) => {
 
 export const formatDate = (date, formatStr = 'dd MMM yyyy') => {
   if (!date) return '';
-  return format(new Date(date), formatStr);
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return '';
+  return format(d, formatStr);
 };
 
 export const formatTime = (date) => {
   if (!date) return '';
-  return format(new Date(date), 'HH:mm');
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return '';
+  return format(d, 'HH:mm');
 };
 
 export const formatDateTime = (date) => {
   if (!date) return '';
-  return format(new Date(date), 'dd MMM yyyy, HH:mm');
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return '';
+  return format(d, 'dd MMM yyyy, HH:mm');
 };
 
 export const calculateDuration = (departure, arrival) => {

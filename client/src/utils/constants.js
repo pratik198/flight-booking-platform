@@ -11,6 +11,14 @@ export const AIRPORTS = [
   { code: 'COK', city: 'Kochi', name: 'Cochin International Airport', country: 'India' },
   { code: 'JAI', city: 'Jaipur', name: 'Jaipur International Airport', country: 'India' },
   { code: 'LKO', city: 'Lucknow', name: 'Chaudhary Charan Singh International Airport', country: 'India' },
+  { code: 'BBI', city: 'Bhubaneswar', name: 'Biju Patnaik International Airport (Odisha)', country: 'India' },
+
+  // International airports
+  { code: 'BCN', city: 'Barcelona', name: 'Barcelona–El Prat Airport', country: 'Spain' },
+  { code: 'JFK', city: 'New York', name: 'John F. Kennedy International Airport', country: 'USA' },
+  { code: 'LHR', city: 'London', name: 'Heathrow Airport', country: 'UK' },
+  { code: 'DXB', city: 'Dubai', name: 'Dubai International Airport', country: 'UAE' },
+  { code: 'SIN', city: 'Singapore', name: 'Changi Airport', country: 'Singapore' },
 ];
 
 export const AIRLINES = [
