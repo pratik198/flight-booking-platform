@@ -75,7 +75,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="relative bg-linear-to-br from-indigo-900 via-indigo-800 to-indigo-900 overflow-hidden">
+      <div className="relative bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-900 overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
