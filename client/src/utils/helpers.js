@@ -61,17 +61,17 @@ export const calculateRefund = (departureTime, price) => {
 };
 
 export const getSeatColor = (status, isSelected = false) => {
-  if (isSelected) return 'bg-green-500 hover:bg-green-600 text-white';
+  if (isSelected) return 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600 shadow-lg';
   
   switch (status) {
     case 'available':
-      return 'bg-gray-200 hover:bg-gray-300 cursor-pointer text-gray-700';
+      return 'bg-white hover:bg-blue-50 hover:border-blue-300 cursor-pointer text-gray-700 border-gray-300';
     case 'held':
-      return 'bg-yellow-400 cursor-not-allowed text-white';
+      return 'bg-orange-100 hover:bg-orange-200 cursor-not-allowed text-orange-800 border-orange-300';
     case 'booked':
-      return 'bg-red-400 cursor-not-allowed text-white';
+      return 'bg-gray-100 hover:bg-gray-200 cursor-not-allowed text-gray-500 border-gray-300';
     default:
-      return 'bg-gray-200 text-gray-700';
+      return 'bg-white text-gray-700 border-gray-300';
   }
 };
 

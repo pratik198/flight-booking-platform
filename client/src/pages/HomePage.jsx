@@ -16,18 +16,27 @@ const HomePage = () => {
       const params = {
         origin: searchParams.origin,
         destination: searchParams.destination,
-        passengers: searchParams.passengers
+        passengers: searchParams.passengers,
+        tripType: searchParams.tripType,
+        cabinClass: searchParams.cabinClass,
+        directFlightsOnly: searchParams.directFlightsOnly
       };
+
       if (searchParams.departureDate) {
         params.date = searchParams.departureDate.toISOString().split('T')[0];
       }
 
+      if (searchParams.returnDate) {
+        params.returnDate = searchParams.returnDate.toISOString().split('T')[0];
+      }
+
       const results = await searchFlights(params);
-      
+
       navigate('/search-results', {
         state: {
           flights: results.flights,
-          searchParams
+          searchParams,
+          searchCriteria: results.searchCriteria
         }
       });
     } catch (error) {

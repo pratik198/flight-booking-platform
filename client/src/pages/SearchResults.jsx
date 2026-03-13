@@ -19,13 +19,14 @@ import Button from '../components/ui/Button';
 import FilterSidebar from '../components/search/FilterSidebar';
 import { FlightCardSkeleton } from '../components/common/Loader';
 import { formatCurrency, formatTime, calculateDuration } from '../utils/helpers';
+import flightService from '../services/flightService';
 
 const SearchResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { flights = [], searchParams } = location.state || {};
+  const { flights: initialFlights = [], searchParams } = location.state || {};
   
-  const [filteredFlights, setFilteredFlights] = useState(flights);
+  const [filteredFlights, setFilteredFlights] = useState(initialFlights);
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState('price');
   const [loading, setLoading] = useState(false);
@@ -38,47 +39,57 @@ const SearchResults = () => {
   });
 
   useEffect(() => {
-    if (!flights.length) {
+    if (!initialFlights.length) {
       toast.error('No flights found');
     }
-  }, [flights]);
+  }, [initialFlights]);
 
-  useEffect(() => {
-    applyFiltersAndSort();
-  }, [filters, sortBy, flights]);
+  // Apply filters and sort server-side
+  const applyFiltersAndSort = async () => {
+    setLoading(true);
+    try {
+      const searchParamsWithFilters = {
+        ...searchParams,
+        sortBy,
+        sortOrder: sortBy.includes('-desc') ? 'desc' : 'asc',
+        airlines: filters.airlines.length > 0 ? filters.airlines : undefined,
+        minPrice: filters.priceRange[0] > 0 ? filters.priceRange[0] : undefined,
+        maxPrice: filters.priceRange[1] < 20000 ? filters.priceRange[1] : undefined,
+        maxStops: filters.stops.length > 0 ? Math.max(...filters.stops.map(s => parseInt(s))) : undefined,
+        // Convert time slots to time ranges
+        ...(filters.departureTimes.length > 0 && getTimeRangeFromSlots(filters.departureTimes, 'departure')),
+        ...(filters.arrivalTimes.length > 0 && getTimeRangeFromSlots(filters.arrivalTimes, 'arrival'))
+      };
 
-  const applyFiltersAndSort = () => {
-    let result = [...flights];
-
-    // Apply airline filter
-    if (filters.airlines.length > 0) {
-      result = result.filter(flight => filters.airlines.includes(flight.airline));
+      const results = await flightService.searchFlights(searchParamsWithFilters);
+      setFilteredFlights(results.flights);
+    } catch (error) {
+      console.error('Filter error:', error);
+      toast.error('Failed to apply filters');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    // Apply price filter
-    result = result.filter(flight => 
-      flight.price >= filters.priceRange[0] && flight.price <= filters.priceRange[1]
-    );
+  // Helper function to convert time slots to time ranges
+  const getTimeRangeFromSlots = (slots, type) => {
+    const timeRanges = {
+      morning: { start: '06:00', end: '12:00' },
+      afternoon: { start: '12:00', end: '18:00' },
+      evening: { start: '18:00', end: '24:00' },
+      night: { start: '00:00', end: '06:00' }
+    };
 
-    // Apply sorting
-    result.sort((a, b) => {
-      switch (sortBy) {
-        case 'price':
-          return a.price - b.price;
-        case 'price-desc':
-          return b.price - a.price;
-        case 'departure':
-          return new Date(a.departureTime) - new Date(b.departureTime);
-        case 'duration':
-          const durA = new Date(a.arrivalTime) - new Date(a.departureTime);
-          const durB = new Date(b.arrivalTime) - new Date(b.departureTime);
-          return durA - durB;
-        default:
-          return 0;
-      }
-    });
+    if (slots.length === 0) return {};
 
-    setFilteredFlights(result);
+    // For simplicity, use the first slot. In a real app, you might want to handle multiple slots
+    const slot = slots[0];
+    const range = timeRanges[slot];
+
+    return {
+      [`${type}TimeStart`]: range.start,
+      [`${type}TimeEnd`]: range.end
+    };
   };
 
   const handleFilterChange = (key, value) => {
@@ -93,6 +104,11 @@ const SearchResults = () => {
       departureTimes: [],
       arrivalTimes: []
     });
+  };
+
+  const handleApplyFilters = () => {
+    applyFiltersAndSort();
+    setShowFilters(false);
   };
 
   const handleSelectFlight = (flight) => {
