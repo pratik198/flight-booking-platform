@@ -39,13 +39,21 @@ const SearchResults = () => {
   });
 
   useEffect(() => {
+    if (!initialFlights.length && !searchParams) {
+      // No flight data and no search params, redirect to home
+      navigate('/');
+      return;
+    }
+    
     if (!initialFlights.length) {
       toast.error('No flights found');
     }
-  }, [initialFlights]);
+  }, [initialFlights, searchParams, navigate]);
 
   // Apply filters and sort server-side
   const applyFiltersAndSort = async () => {
+    if (!searchParams) return;
+    
     setLoading(true);
     try {
       const searchParamsWithFilters = {
@@ -129,7 +137,7 @@ const SearchResults = () => {
     return logos[airline] || airline.substring(0, 2);
   };
 
-  if (!flights.length) {
+  if (!filteredFlights.length) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-12 max-w-md text-center">
@@ -271,7 +279,7 @@ const SearchResults = () => {
                         <span className="text-sm">{airline}</span>
                       </div>
                       <span className="text-xs text-gray-500">
-                        {flights.filter(f => f.airline === airline).length}
+                        {filteredFlights.filter(f => f.airline === airline).length}
                       </span>
                     </label>
                   ))}
@@ -304,7 +312,7 @@ const SearchResults = () => {
           <div className="flex-1">
             {/* Results Count */}
             <div className="mb-4 text-sm text-gray-600">
-              Showing {filteredFlights.length} of {flights.length} flights
+              Showing {filteredFlights.length} of {initialFlights.length} flights
             </div>
 
             {/* Flight Cards */}
