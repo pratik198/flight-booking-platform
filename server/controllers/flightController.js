@@ -87,9 +87,9 @@ exports.searchFlights = async (req, res) => {
     }
 
     // Cabin class filtering (assuming flights have cabinClass field)
-    if (cabinClass && cabinClass !== 'all') {
-      query.cabinClass = cabinClass;
-    }
+    // if (cabinClass && cabinClass !== 'all') {
+    //   query.cabinClass = cabinClass;
+    // }
 
     // Direct flights only
     if (directFlightsOnly === 'true') {
